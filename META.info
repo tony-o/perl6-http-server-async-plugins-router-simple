@@ -5,7 +5,7 @@
   "auth"        : "github:tony-o",
   "depends"     : [ "HTTP::Server::Async" ],
   "provides" : {
-    "HTTP::Server::Async::Plugins::Router::Simple" : "lib/HTTP/Server/Async/Plugins/Router/Simple.pm6",  
+    "HTTP::Server::Async::Plugins::Router::Simple" : "lib/HTTP/Server/Async/Plugins/Router/Simple.pm6"
   },
   "source-url"  : "git://github.com/tony-o/perl6-http-server-async-plugins-router-simple.git"
 } 
