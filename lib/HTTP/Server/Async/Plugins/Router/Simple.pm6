@@ -8,14 +8,14 @@ class HTTP::Server::Async::Plugins::Router::Simple {
   method handler($request,$response,$next) {
     my ($promise, $result);
     my $keeper  = sub (Bool $next? = True) {
-      $promise.keep;
       $result = $next;
+      $promise.keep;
     };
     for @.routes -> $route {
       next if Any !~~ $route<method>.WHAT && $route<method>.lc ne $request.method.lc;
       given $route<route> {
         when .WHAT ~~ Regex {
-          next unless $request.uri ~~  $route<route>; 
+          next unless $request.uri ~~ $route<route>; 
         };
         default {
           next unless $request.uri eq $route<route>;
@@ -23,11 +23,12 @@ class HTTP::Server::Async::Plugins::Router::Simple {
       };
       $promise = Promise.new;
       $route<sub>($request,$response,$keeper);
-      await $promise;
-      last if     $response.promise.status ~~ Kept;
-      last unless $result;
+      await Promise.anyof($promise, $response.promise);
+      last if $response.promise.status ~~ Kept;
+      last if !$result;
     }
-    $next() if $result;
+    $promise.break(False) if !$result && $response.promise.status ~~ Kept;
+    $next(True) if !$result || $response.promise.status !~~ Kept;
   }
 
   method !push($method, $route, $sub) {
