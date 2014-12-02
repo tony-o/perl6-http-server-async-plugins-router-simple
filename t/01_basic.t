@@ -4,6 +4,7 @@ use lib 'lib';
 use HTTP::Server::Async::Plugins::Router::Simple;
 use HTTP::Server::Async;
 use Test;
+plan 6;
 
 my $host = '127.0.0.1';
 my $port = (6000..8000).pick;
