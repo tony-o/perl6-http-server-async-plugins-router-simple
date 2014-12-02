@@ -24,6 +24,7 @@ class HTTP::Server::Async::Plugins::Router::Simple {
       $promise = Promise.new;
       $route<sub>($request,$response,$keeper);
       await $promise;
+      last if     $respones.promise ~~ Kept;
       last unless $result;
     }
     $next() if $result;
