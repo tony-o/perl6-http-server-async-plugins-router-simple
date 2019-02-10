@@ -2,15 +2,11 @@ class HTTP::Server::Async::Plugins::Router::Simple {
   has @.routes;
 
   method hook($server) {
-    $server.register(-> |args { $.handler(|args); });
+    $server.handler(-> |args { $.handler(|args); });
   }
 
-  method handler($request,$response,$next) {
+  method handler($request,$response) {
     my ($promise, $result);
-    my $keeper  = sub (Bool $next? = True) {
-      $result = $next;
-      $promise.keep;
-    };
     for @.routes -> $route {
       next if Any !~~ $route<method>.WHAT && $route<method>.lc ne $request.method.lc;
       given $route<route> {
@@ -21,14 +17,12 @@ class HTTP::Server::Async::Plugins::Router::Simple {
           next unless $request.uri eq $route<route>;
         }
       };
-      $promise = Promise.new;
-      $route<sub>($request,$response,$keeper);
-      await Promise.anyof($promise, $response.promise);
-      last if $response.promise.status ~~ Kept;
-      last if !$result;
+      $promise = $route<sub>($request,$response);
+      await $promise if $promise ~~ Promise;
+      $result = ($promise ~~ Promise && $promise.status ~~ Kept) || ($promise ~~ Bool && $promise);
+      return False if !$result;
     }
-    $promise.break(False) if !$result && $response.promise.status ~~ Kept;
-    $next(True) if !$result || $response.promise.status !~~ Kept;
+    True;
   }
 
   method !push($method, $route, $sub) {
