@@ -3,7 +3,7 @@
   "name"        : "HTTP::Server::Async::Plugins::Router::Simple",
   "version"     : "0.1.2",
   "description" : "Basic routing for http server",
-  "auth"        : "github:tony-o",
+  "auth"        : "zef:tony-o",
   "depends"     : [ "HTTP::Server::Async" ],
   "provides" : {
     "HTTP::Server::Async::Plugins::Router::Simple" : "lib/HTTP/Server/Async/Plugins/Router/Simple.pm6"
